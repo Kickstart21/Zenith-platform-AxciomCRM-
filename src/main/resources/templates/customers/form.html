@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#customerFormContent}, title=(${customerDto.customerId != null ? 'Edit Customer' : 'New Customer'}))}">
+    <div id="customerFormContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Customers</li>
+                            <li th:text="${customerDto.customerId != null ? 'Edit' : 'Create'}">Create</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a th:href="@{/customers}" class="button is-light">
+                            <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                            <span>Back to List</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title" th:text="${customerDto.customerId != null ? 'Edit Customer: ' + customerDto.customerCode : 'Register New Customer'}">Customer Form</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section (AdminOne Form Structure) -->
+        <section class="section is-main-section">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-ballot"></i></span>
+                        Account Details
+                    </p>
+                </header>
+                <div class="card-content">
+                    <form th:action="${customerDto.customerId != null} ? @{/customers/{id}/edit(id=${customerDto.customerId})} : @{/customers/create}"
+                          th:object="${customerDto}" method="post">
+
+                        <!-- Customer Name -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Customer Name *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{customerName}"
+                                               th:classappend="${#fields.hasErrors('customerName')} ? 'is-danger' : ''"
+                                               placeholder="Organization or Contact Name" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}">Customer Name is required.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email & Phone -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Contact Info *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="email" th:field="*{email}"
+                                               th:classappend="${#fields.hasErrors('email')} ? 'is-danger' : ''"
+                                               placeholder="Work Email" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-email"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Enter a valid email address.</p>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="tel" th:field="*{phone}"
+                                               th:classappend="${#fields.hasErrors('phone')} ? 'is-danger' : ''"
+                                               placeholder="10-digit Indian Mobile" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-phone"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Enter a valid phone number.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company & Status -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Company / Status</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{companyName}" placeholder="Company Name">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-domain"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{status}">
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Address -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Address</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text" th:field="*{address}" placeholder="Office Street Address">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- City & State -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Location</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text" th:field="*{city}" placeholder="City (e.g. Mumbai)">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text" th:field="*{state}" placeholder="State (e.g. Maharashtra)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Actions -->
+                        <div class="field is-horizontal">
+                            <div class="field-label"></div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="field is-grouped">
+                                        <div class="control">
+                                            <button type="submit" class="button is-primary">
+                                                <span>Save Customer</span>
+                                            </button>
+                                        </div>
+                                        <div class="control">
+                                            <a th:href="@{/customers}" class="button is-light">Cancel</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

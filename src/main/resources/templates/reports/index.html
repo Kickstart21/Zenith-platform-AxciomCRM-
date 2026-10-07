@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#reportsContent}, title='Reports & Data Export')}">
+    <div id="reportsContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Analytics</li>
+                            <li>Reports</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Management Reports & Analytics Export</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="tile is-ancestor">
+                <!-- Customers Export Card -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child has-text-centered">
+                        <div class="card-content">
+                            <div class="has-text-primary mb-3">
+                                <span class="icon is-large"><i class="mdi mdi-account-multiple mdi-48px"></i></span>
+                            </div>
+                            <h2 class="title is-5">Customer Directory</h2>
+                            <p class="subtitle is-6 has-text-grey">Commercial registrations, contacts, and account status</p>
+                            <div class="mb-4">
+                                <span class="tag is-primary is-medium">
+                                    <span th:text="${totalCustomers}">0</span> Records
+                                </span>
+                            </div>
+                            <a th:href="@{/reports/export/customers}" class="button is-primary is-outlined is-fullwidth">
+                                <span class="icon"><i class="mdi mdi-file-delimited"></i></span>
+                                <span>Export Customers (.CSV)</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leads Export Card -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child has-text-centered">
+                        <div class="card-content">
+                            <div class="has-text-info mb-3">
+                                <span class="icon is-large"><i class="mdi mdi-bullseye mdi-48px"></i></span>
+                            </div>
+                            <h2 class="title is-5">Prospects & Leads</h2>
+                            <p class="subtitle is-6 has-text-grey">Lead funnel progression, status, and pipeline values</p>
+                            <div class="mb-4">
+                                <span class="tag is-info is-medium">
+                                    <span th:text="${totalLeads}">0</span> Records
+                                </span>
+                            </div>
+                            <a th:href="@{/reports/export/leads}" class="button is-info is-outlined is-fullwidth">
+                                <span class="icon"><i class="mdi mdi-file-delimited"></i></span>
+                                <span>Export Leads (.CSV)</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunities Export Card -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child has-text-centered">
+                        <div class="card-content">
+                            <div class="has-text-success mb-3">
+                                <span class="icon is-large"><i class="mdi mdi-finance mdi-48px"></i></span>
+                            </div>
+                            <h2 class="title is-5">Pipeline Opportunities</h2>
+                            <p class="subtitle is-6 has-text-grey">Forecasted amounts, probability weights, and stage outcomes</p>
+                            <div class="mb-4">
+                                <span class="tag is-success is-medium">
+                                    <span th:text="${totalOpportunities}">0</span> Records
+                                </span>
+                            </div>
+                            <a th:href="@{/reports/export/opportunities}" class="button is-success is-outlined is-fullwidth">
+                                <span class="icon"><i class="mdi mdi-file-delimited"></i></span>
+                                <span>Export Opportunities (.CSV)</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#leadListContent}, title='Lead Management')}">
+    <div id="leadListContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li>Leads</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/leads/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>Add New Lead</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Sales Leads</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <!-- Filter Toolbar -->
+            <div class="card mb-4">
+                <div class="card-content">
+                    <form th:action="@{/leads}" method="get">
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" name="query" th:value="${query}"
+                                               placeholder="Search by lead prospect or company name...">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-magnify"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <div class="select">
+                                            <select name="status">
+                                                <option value="">All Statuses</option>
+                                                <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.label}"
+                                                        th:selected="${st == selectedStatus}">New</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <button type="submit" class="button is-info">Filter</button>
+                                        <a th:href="@{/leads}" class="button is-light">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Leads Table Card -->
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-bullseye"></i></span>
+                        Leads Records (<span th:text="${totalElements}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Prospect Name</th>
+                                        <th>Company</th>
+                                        <th>Contact</th>
+                                        <th>Expected Value</th>
+                                        <th>Status</th>
+                                        <th>Assigned To</th>
+                                        <th class="has-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${leads.empty}">
+                                        <td colspan="8" class="has-text-centered has-text-grey py-5">
+                                            <span class="icon is-large"><i class="mdi mdi-emoticon-sad mdi-48px"></i></span>
+                                            <p>No leads found matching your criteria.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="l : ${leads}">
+                                        <td>
+                                            <span class="tag is-info is-light" th:text="${l.leadCode}">LEAD-1001</span>
+                                        </td>
+                                        <td data-label="Prospect">
+                                            <a th:href="@{/leads/{id}(id=${l.leadId})}" class="has-text-weight-bold" th:text="${l.leadName}">Prospect Name</a>
+                                            <small class="has-text-grey is-block" th:text="${l.source != null ? 'Source: ' + l.source : ''}">Website</small>
+                                        </td>
+                                        <td data-label="Company" th:text="${l.companyName != null ? l.companyName : '-'}">Company</td>
+                                        <td data-label="Contact">
+                                            <div th:text="${l.email}">email@domain.com</div>
+                                            <small class="has-text-grey" th:text="${l.phone}">+91 9876543210</small>
+                                        </td>
+                                        <td data-label="Value">
+                                            <strong>₹<span th:text="${#numbers.formatDecimal(l.expectedValue, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                                        </td>
+                                        <td data-label="Status">
+                                            <span class="tag"
+                                                  th:classappend="${l.status.name() == 'NEW' ? 'is-info' : (l.status.name() == 'CONTACTED' ? 'is-link' : (l.status.name() == 'QUALIFIED' ? 'is-warning' : (l.status.name() == 'CONVERTED' ? 'is-success' : 'is-danger')))}"
+                                                  th:text="${l.status.label}">Status</span>
+                                        </td>
+                                        <td data-label="Assigned" th:text="${l.assignedTo}">sales@acxiom.com</td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <!-- Convert for Qualified -->
+                                                <a th:if="${l.status.name() == 'QUALIFIED'}" th:href="@{/leads/{id}/convert(id=${l.leadId})}"
+                                                   class="button is-small is-success" title="Convert to Customer & Opportunity">
+                                                    <span class="icon"><i class="mdi mdi-lightning-bolt"></i></span>
+                                                    <span>Convert</span>
+                                                </a>
+                                                <a th:href="@{/leads/{id}(id=${l.leadId})}" class="button is-small is-primary is-outlined" title="View Details">
+                                                    <span class="icon"><i class="mdi mdi-eye"></i></span>
+                                                </a>
+                                                <a th:if="${l.status.name() != 'CONVERTED' and l.status.name() != 'LOST'}"
+                                                   th:href="@{/leads/{id}/edit(id=${l.leadId})}" class="button is-small is-info is-outlined" title="Edit">
+                                                    <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                                </a>
+                                                <form th:action="@{/leads/{id}/delete(id=${l.leadId})}" method="post" style="display:inline;"
+                                                      onsubmit="return confirm('Are you sure you want to delete this lead?');">
+                                                    <button type="submit" class="button is-small is-danger is-outlined" title="Delete">
+                                                        <span class="icon"><i class="mdi mdi-trash-can"></i></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Notification -->
+                        <div th:if="${totalPages > 1}" class="notification">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="buttons has-addons">
+                                            <a th:if="${currentPage > 0}" th:href="@{/leads(page=${currentPage - 1}, query=${query}, status=${selectedStatus})}"
+                                               class="button">&laquo;</a>
+                                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                               th:href="@{/leads(page=${i}, query=${query}, status=${selectedStatus})}"
+                                               class="button" th:classappend="${i == currentPage ? 'is-active' : ''}"
+                                               th:text="${i + 1}">1</a>
+                                            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/leads(page=${currentPage + 1}, query=${query}, status=${selectedStatus})}"
+                                               class="button">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <small>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span> (<span th:text="${totalElements}">0</span> total)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

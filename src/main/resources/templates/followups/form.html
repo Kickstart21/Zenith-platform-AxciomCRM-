@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#followUpFormContent}, title='Schedule Follow-Up')}">
+    <div id="followUpFormContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/followups}">Follow-Ups</a></li>
+                            <li>Schedule</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a th:href="@{/followups}" class="button is-light">
+                            <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                            <span>Back to List</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Schedule Follow-Up</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-calendar-plus"></i></span>
+                        Engagement Specification
+                    </p>
+                </header>
+                <div class="card-content">
+                    <form th:action="@{/followups/create}" th:object="${followUpDto}" method="post">
+
+                        <!-- Target Customer & Lead -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Target Record</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{customerId}">
+                                                <option value="">-- No Customer Selected --</option>
+                                                <option th:each="c : ${customers}" th:value="${c.customerId}" th:text="${c.customerName + ' (' + c.customerCode + ')'}">Customer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="number" th:field="*{leadId}" placeholder="Optional Lead ID">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-bullseye"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Type & Date -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Type & Schedule *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{followUpType}" required>
+                                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Call</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="datetime-local" id="followUpDate" th:field="*{followUpDate}"
+                                               th:classappend="${#fields.hasErrors('followUpDate')} ? 'is-danger' : ''" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-calendar-clock"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('followUpDate')}" th:errors="*{followUpDate}">Follow-up date cannot be earlier than today.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remarks / Agenda -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Discussion Agenda</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <textarea class="textarea" th:field="*{remarks}" placeholder="Key discussion points, expected outcomes..." maxlength="500"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assigned Executive -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Assigned Executive</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{assignedTo}" placeholder="sales@acxiom.com (leave blank for self)">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account-tie"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Action Buttons -->
+                        <div class="field is-horizontal">
+                            <div class="field-label"></div>
+                            <div class="field-body">
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary">
+                                            <span class="icon"><i class="mdi mdi-check"></i></span>
+                                            <span>Save Follow-Up</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <a th:href="@{/followups}" class="button is-light">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                const dateEl = document.getElementById('followUpDate');
+                if (dateEl) {
+                    dateEl.min = now.toISOString().slice(0, 16);
+                }
+            });
+        </script>
+    </div>
+</div>
+
+</body>
+</html>

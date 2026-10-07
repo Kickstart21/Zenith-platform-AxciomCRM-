@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#oppDetailsContent}, title='Opportunity Details')}">
+    <div id="oppDetailsContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/opportunities}">Opportunities</a></li>
+                            <li>Details</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/opportunities/{id}/edit(id=${opportunity.opportunityId})}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                <span>Edit Deal</span>
+                            </a>
+                            <a th:href="@{/opportunities}" class="button is-light">
+                                <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                                <span>Back to List</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title" th:text="${opportunity.opportunityName}">Deal Name</h1>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <span class="tag is-medium"
+                                  th:classappend="${opportunity.stage.name() == 'WON' ? 'is-success' : (opportunity.stage.name() == 'LOST' ? 'is-danger' : 'is-info')}"
+                                  th:text="${opportunity.stage.label}">Stage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="tile is-ancestor">
+                <div class="tile is-parent is-8">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-briefcase-check"></i></span>
+                                Commercial Valuation & Metrics
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Contract / Deal Value</p>
+                                    <p class="subtitle is-4 has-text-weight-bold has-text-dark">
+                                        ₹<span th:text="${#numbers.formatDecimal(opportunity.amount, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Weighted Pipeline Value (Amount &times; Win %)</p>
+                                    <p class="subtitle is-4 has-text-weight-bold has-text-success">
+                                        ₹<span th:text="${#numbers.formatDecimal(opportunity.weightedValue, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Win Probability</p>
+                                    <p class="subtitle is-6 has-text-weight-bold has-text-primary" th:text="${opportunity.probability} + '%'">50%</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Customer Entity</p>
+                                    <p class="subtitle is-6" th:text="${customer != null ? customer.customerName : 'ID: ' + opportunity.customerId}">Customer</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Target Close Date</p>
+                                    <p class="subtitle is-6" th:text="${#temporals.format(opportunity.expectedCloseDate, 'dd-MMM-yyyy')}">Date</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Deal Status</p>
+                                    <p class="subtitle is-6">
+                                        <span class="tag is-light" th:text="${opportunity.status}">Open</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Assigned Sales Executive</p>
+                                    <p class="subtitle is-6" th:text="${opportunity.assignedTo}">sales@acxiom.com</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Logged Timestamp</p>
+                                    <p class="subtitle is-6" th:text="${#temporals.format(opportunity.createdDate, 'dd-MMM-yyyy HH:mm')}">Date</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tile is-parent is-4">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-lightning-bolt"></i></span>
+                                Related Engagements
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="buttons">
+                                <a th:href="@{/followups/create(customerId=${opportunity.customerId})}" class="button is-fullwidth is-info is-outlined mb-3">
+                                    <span class="icon"><i class="mdi mdi-calendar-plus"></i></span>
+                                    <span>Schedule Follow-Up</span>
+                                </a>
+                                <a th:href="@{/activities/create(customerId=${opportunity.customerId})}" class="button is-fullwidth is-primary is-outlined">
+                                    <span class="icon"><i class="mdi mdi-clipboard-text-outline"></i></span>
+                                    <span>Log Activity</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#leadDetailsContent}, title='Lead Details')}">
+    <div id="leadDetailsContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/leads}">Leads</a></li>
+                            <li>Profile</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:if="${lead.status.name() == 'QUALIFIED'}" th:href="@{/leads/{id}/convert(id=${lead.leadId})}"
+                               class="button is-success">
+                                <span class="icon"><i class="mdi mdi-lightning-bolt"></i></span>
+                                <span>Convert Lead</span>
+                            </a>
+                            <a th:if="${lead.status.name() != 'CONVERTED' and lead.status.name() != 'LOST'}"
+                               th:href="@{/leads/{id}/edit(id=${lead.leadId})}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                <span>Edit Lead</span>
+                            </a>
+                            <a th:href="@{/leads}" class="button is-light">
+                                <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                                <span>Back to List</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title" th:text="${lead.leadName}">Lead Name</h1>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <span class="tag is-medium"
+                                  th:classappend="${lead.status.name() == 'NEW' ? 'is-info' : (lead.status.name() == 'CONTACTED' ? 'is-link' : (lead.status.name() == 'QUALIFIED' ? 'is-warning' : (lead.status.name() == 'CONVERTED' ? 'is-success' : 'is-danger')))}"
+                                  th:text="${lead.status.label}">Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="tile is-ancestor">
+                <div class="tile is-parent is-8">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-bullseye"></i></span>
+                                Prospect Details
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Reference Code</p>
+                                    <p class="subtitle is-6">
+                                        <span class="tag is-info is-light" th:text="${lead.leadCode}">LEAD-1001</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Organization / Company</p>
+                                    <p class="subtitle is-6" th:text="${lead.companyName != null ? lead.companyName : 'N/A'}">Company</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Email Address</p>
+                                    <p class="subtitle is-6">
+                                        <a th:href="'mailto:' + ${lead.email}" th:text="${lead.email}">email@domain.com</a>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Contact Phone</p>
+                                    <p class="subtitle is-6" th:text="${lead.phone}">+91 9876543210</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Acquisition Source</p>
+                                    <p class="subtitle is-6">
+                                        <span class="tag is-light" th:text="${lead.source != null ? lead.source : 'Direct'}">Source</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Expected Deal Value</p>
+                                    <p class="subtitle is-5 has-text-success has-text-weight-bold">
+                                        ₹<span th:text="${#numbers.formatDecimal(lead.expectedValue, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Assigned Executive</p>
+                                    <p class="subtitle is-6" th:text="${lead.assignedTo}">sales@acxiom.com</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Created Date</p>
+                                    <p class="subtitle is-6" th:text="${#temporals.format(lead.createdDate, 'dd-MMM-yyyy HH:mm')}">Date</p>
+                                </div>
+                            </div>
+
+                            <!-- Qualified Lead Callout -->
+                            <div th:if="${lead.status.name() == 'QUALIFIED'}" class="notification is-warning mt-4">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            <div>
+                                                <b><span class="icon"><i class="mdi mdi-check-circle"></i></span> Lead is Qualified!</b>
+                                                <p>Ready to convert into an active Customer account and create an Opportunity.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="level-right">
+                                        <a th:href="@{/leads/{id}/convert(id=${lead.leadId})}" class="button is-success">
+                                            <span class="icon"><i class="mdi mdi-lightning-bolt"></i></span>
+                                            <span>Convert Now</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tile is-parent is-4">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-information-outline"></i></span>
+                                Qualification Rules
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content is-small">
+                                <ul>
+                                    <li><b>New &rarr; Contacted or Lost</b></li>
+                                    <li><b>Contacted &rarr; Qualified or Lost</b></li>
+                                    <li><b>Qualified &rarr; Converted</b></li>
+                                    <li>Only <em>Qualified</em> leads can undergo atomic conversion.</li>
+                                    <li>Converted leads are locked against further modification.</li>
+                                </ul>
+                            </div>
+                            <hr>
+                            <div class="buttons">
+                                <a th:href="@{/followups/create(leadId=${lead.leadId})}" class="button is-fullwidth is-info is-outlined">
+                                    <span class="icon"><i class="mdi mdi-calendar-plus"></i></span>
+                                    <span>Schedule Follow-Up</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

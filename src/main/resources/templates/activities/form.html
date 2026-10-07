@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#activityFormContent}, title='Log CRM Activity')}">
+    <div id="activityFormContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/activities}">Activities</a></li>
+                            <li>Log</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a th:href="@{/activities}" class="button is-light">
+                            <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                            <span>Back to List</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Log Client Activity</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-clipboard-text"></i></span>
+                        Activity Details
+                    </p>
+                </header>
+                <div class="card-content">
+                    <form th:action="@{/activities/create}" th:object="${activityDto}" method="post">
+
+                        <!-- Activity Type & Date -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Type & Date *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{activityType}" required>
+                                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Call</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="datetime-local" th:field="*{activityDate}" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-clock-outline"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Subject *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{subject}"
+                                               placeholder="e.g. Discovery call regarding Q4 cloud requirements" required maxlength="150">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-format-title"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related Customer & Lead -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Related Record</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{customerId}">
+                                                <option value="">-- No Customer Selected --</option>
+                                                <option th:each="c : ${customers}" th:value="${c.customerId}" th:text="${c.customerName + ' (' + c.customerCode + ')'}">Customer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="number" th:field="*{leadId}" placeholder="Optional Lead ID">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-bullseye"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Notes / Outcomes</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <textarea class="textarea" th:field="*{description}"
+                                                  placeholder="Summary of conversation, key decisions made, next steps..." maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status & Logged By -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Status & Logged By</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{status}">
+                                                <option value="Completed">Completed</option>
+                                                <option value="Pending">Pending</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{assignedTo}"
+                                               placeholder="sales@acxiom.com (leave blank for self)">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account-tie"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Action Buttons -->
+                        <div class="field is-horizontal">
+                            <div class="field-label"></div>
+                            <div class="field-body">
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary">
+                                            <span class="icon"><i class="mdi mdi-check"></i></span>
+                                            <span>Save Activity</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <a th:href="@{/activities}" class="button is-light">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

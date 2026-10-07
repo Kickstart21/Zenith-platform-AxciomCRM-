@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Account — Zenith</title>
+    <link rel="stylesheet" th:href="@{/css/main.min.css}">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Nunito', sans-serif;
+        }
+        .register-box {
+            width: 100%;
+            max-width: 480px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-box">
+    <div class="card">
+        <header class="card-header has-background-dark">
+            <p class="card-header-title has-text-white">
+                <span class="icon mr-2"><i class="mdi mdi-account-plus"></i></span>
+                Create Zenith Account
+            </p>
+        </header>
+
+        <div class="card-content">
+            <div th:if="${errorMessage}" class="notification is-danger" style="padding: 0.75rem 1rem; font-size: 0.9rem;">
+                <span th:text="${errorMessage}">Registration error</span>
+            </div>
+
+            <form th:action="@{/register}" method="post">
+                <div class="field">
+                    <label class="label">Full Name</label>
+                    <div class="control has-icons-left">
+                        <input id="fullName" name="fullName" class="input" type="text" placeholder="John Doe" required autofocus>
+                        <span class="icon is-small is-left"><i class="mdi mdi-account"></i></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Work Email Address</label>
+                    <div class="control has-icons-left">
+                        <input id="email" name="email" class="input" type="email" placeholder="john.doe@acxiom.com" required>
+                        <span class="icon is-small is-left"><i class="mdi mdi-email"></i></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control has-icons-left">
+                        <input id="password" name="password" class="input" type="password" placeholder="Min 8 characters" required>
+                        <span class="icon is-small is-left"><i class="mdi mdi-lock"></i></span>
+                    </div>
+                    <p class="help">Must contain uppercase, lowercase, digit, and special symbol (@$!%*?&#).</p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Confirm Password</label>
+                    <div class="control has-icons-left">
+                        <input id="confirmPassword" name="confirmPassword" class="input" type="password" placeholder="Re-enter password" required>
+                        <span class="icon is-small is-left"><i class="mdi mdi-lock-check"></i></span>
+                    </div>
+                </div>
+
+                <div class="field mt-4">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            <span>Register Account</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <hr>
+
+            <div class="has-text-centered is-size-7">
+                <span>Already have an account? <a th:href="@{/login}" class="has-text-link">Sign In</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

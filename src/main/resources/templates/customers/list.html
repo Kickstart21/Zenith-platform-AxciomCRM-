@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#customerListContent}, title='Customers')}">
+    <div id="customerListContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li>Customers</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/customers/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>Add Customer</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Customer Accounts</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <!-- Filter Card -->
+            <div class="card mb-4">
+                <div class="card-content">
+                    <form th:action="@{/customers}" method="get">
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" name="query" th:value="${query}"
+                                               placeholder="Search by customer name, email, phone, or company...">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-magnify"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <div class="select">
+                                            <select name="status">
+                                                <option value="">All Statuses</option>
+                                                <option value="Active" th:selected="${status == 'Active'}">Active</option>
+                                                <option value="Inactive" th:selected="${status == 'Inactive'}">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <button type="submit" class="button is-info">Filter</button>
+                                        <a th:href="@{/customers}" class="button is-light">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+                        Active Customers (<span th:text="${totalElements}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Customer Name</th>
+                                        <th>Company</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>City / State</th>
+                                        <th>Status</th>
+                                        <th class="has-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${customers.empty}">
+                                        <td colspan="8" class="has-text-centered py-5 has-text-grey">
+                                            <span class="icon is-large"><i class="mdi mdi-emoticon-sad mdi-48px"></i></span>
+                                            <p>No customers found.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="c : ${customers}">
+                                        <td><b th:text="${c.customerCode}">CUST-1001</b></td>
+                                        <td>
+                                            <a th:href="@{/customers/{id}(id=${c.customerId})}" th:text="${c.customerName}" class="has-text-weight-bold has-text-dark">Acme</a>
+                                        </td>
+                                        <td th:text="${c.companyName != null ? c.companyName : '-'}">Acme Inc</td>
+                                        <td th:text="${c.email}">contact@acme.com</td>
+                                        <td th:text="${c.phone}">+91 9876543210</td>
+                                        <td>
+                                            <span th:text="${c.city != null ? c.city : '-'}">City</span>,
+                                            <small class="has-text-grey" th:text="${c.state != null ? c.state : ''}">State</small>
+                                        </td>
+                                        <td>
+                                            <span class="tag" th:classappend="${c.status == 'Active' ? 'is-success' : 'is-light'}" th:text="${c.status}">Active</span>
+                                        </td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <a th:href="@{/customers/{id}(id=${c.customerId})}" class="button is-small is-info" title="View Details">
+                                                    <span class="icon"><i class="mdi mdi-eye"></i></span>
+                                                </a>
+                                                <a th:href="@{/customers/{id}/edit(id=${c.customerId})}" class="button is-small is-primary" title="Edit">
+                                                    <span class="icon"><i class="mdi mdi-pencil"></i></span>
+                                                </a>
+                                                <form th:action="@{/customers/{id}/delete(id=${c.customerId})}" method="post" style="display:inline;"
+                                                      onsubmit="return confirm('Deactivate this customer?');">
+                                                    <button type="submit" class="button is-small is-danger" title="Deactivate">
+                                                        <span class="icon"><i class="mdi mdi-delete"></i></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="notification" th:if="${totalPages > 1}">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="buttons has-addons">
+                                            <a class="button" th:if="${currentPage > 0}" th:href="@{/customers(page=${currentPage - 1}, query=${query}, status=${status})}">&laquo;</a>
+                                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                               th:href="@{/customers(page=${i}, query=${query}, status=${status})}"
+                                               class="button" th:classappend="${i == currentPage ? 'is-active is-primary' : ''}"
+                                               th:text="${i + 1}">1</a>
+                                            <a class="button" th:if="${currentPage + 1 < totalPages}" th:href="@{/customers(page=${currentPage + 1}, query=${query}, status=${status})}">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <small>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#activityListContent}, title='Activity History')}">
+    <div id="activityListContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li>Activities</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/activities/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>Log Activity</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Activity History</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <!-- Filter Card -->
+            <div class="card mb-4">
+                <div class="card-content">
+                    <form th:action="@{/activities}" method="get">
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select name="type">
+                                                <option value="">All Activity Types</option>
+                                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}"
+                                                        th:selected="${t == selectedType}">Call</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select name="status">
+                                                <option value="">All Statuses</option>
+                                                <option value="Completed" th:selected="${status == 'Completed'}">Completed</option>
+                                                <option value="Pending" th:selected="${status == 'Pending'}">Pending</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <button type="submit" class="button is-info">Filter</button>
+                                        <a th:href="@{/activities}" class="button is-light">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Activities Table Card -->
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-clipboard-text"></i></span>
+                        Logged Engagements (<span th:text="${totalElements}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Activity Type</th>
+                                        <th>Subject & Summary</th>
+                                        <th>Timestamp</th>
+                                        <th>Related Record</th>
+                                        <th>Status</th>
+                                        <th>Logged By</th>
+                                        <th class="has-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${activities.empty}">
+                                        <td colspan="7" class="has-text-centered has-text-grey py-5">
+                                            <span class="icon is-large"><i class="mdi mdi-emoticon-sad mdi-48px"></i></span>
+                                            <p>No activity records found.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="a : ${activities}">
+                                        <td data-label="Type">
+                                            <span class="tag"
+                                                  th:classappend="${a.activityType.name() == 'CALL' ? 'is-info' : (a.activityType.name() == 'MEETING' ? 'is-primary' : (a.activityType.name() == 'EMAIL' ? 'is-link' : 'is-warning'))}"
+                                                  th:text="${a.activityType.label}">Type</span>
+                                        </td>
+                                        <td data-label="Subject">
+                                            <div class="has-text-weight-semibold" th:text="${a.subject}">Subject</div>
+                                            <small class="has-text-grey is-block" style="max-width: 320px;" th:text="${a.description}">Description</small>
+                                        </td>
+                                        <td data-label="Date">
+                                            <small class="has-text-grey" th:text="${#temporals.format(a.activityDate, 'dd-MMM-yyyy HH:mm')}">Date</small>
+                                        </td>
+                                        <td data-label="Related">
+                                            <span th:if="${a.customerId != null}" class="tag is-info is-light">Customer #<span th:text="${a.customerId}"></span></span>
+                                            <span th:if="${a.leadId != null}" class="tag is-primary is-light">Lead #<span th:text="${a.leadId}"></span></span>
+                                            <span th:if="${a.customerId == null and a.leadId == null}" class="has-text-grey is-size-7">General</span>
+                                        </td>
+                                        <td data-label="Status">
+                                            <span class="tag is-success" th:text="${a.status}">Completed</span>
+                                        </td>
+                                        <td data-label="By" th:text="${a.assignedTo}">sales@acxiom.com</td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <form th:action="@{/activities/{id}/delete(id=${a.activityId})}" method="post" style="display:inline;"
+                                                      onsubmit="return confirm('Delete this activity entry?');">
+                                                    <button type="submit" class="button is-small is-danger is-outlined" title="Delete">
+                                                        <span class="icon"><i class="mdi mdi-trash-can"></i></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Notification -->
+                        <div th:if="${totalPages > 1}" class="notification">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="buttons has-addons">
+                                            <a th:if="${currentPage > 0}" th:href="@{/activities(page=${currentPage - 1})}"
+                                               class="button">&laquo;</a>
+                                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                               th:href="@{/activities(page=${i})}"
+                                               class="button" th:classappend="${i == currentPage ? 'is-active' : ''}"
+                                               th:text="${i + 1}">1</a>
+                                            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/activities(page=${currentPage + 1})}"
+                                               class="button">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <small>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span> (<span th:text="${totalElements}">0</span> total)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

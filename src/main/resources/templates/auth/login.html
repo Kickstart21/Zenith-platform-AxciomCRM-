@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login — Zenith</title>
+    <link rel="stylesheet" th:href="@{/css/main.min.css}">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Nunito', sans-serif;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 440px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="card">
+        <header class="card-header has-background-dark">
+            <p class="card-header-title has-text-white">
+                <span class="icon mr-2"><i class="mdi mdi-lock"></i></span>
+                Zenith &bull; Sign In
+            </p>
+        </header>
+
+        <div class="card-content">
+            <!-- Alerts -->
+            <div th:if="${errorMessage}" class="notification is-danger" style="padding: 0.75rem 1rem; font-size: 0.9rem;">
+                <span th:text="${errorMessage}">Invalid credentials</span>
+            </div>
+            <div th:if="${successMessage}" class="notification is-success" style="padding: 0.75rem 1rem; font-size: 0.9rem;">
+                <span th:text="${successMessage}">Logged out</span>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <label class="label">Email Address</label>
+                    <div class="control has-icons-left">
+                        <input id="username" name="username" class="input" type="email" placeholder="user@acxiom.com" required autofocus>
+                        <span class="icon is-small is-left"><i class="mdi mdi-email"></i></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control has-icons-left">
+                        <input id="password" name="password" class="input" type="password" placeholder="Password" required>
+                        <span class="icon is-small is-left"><i class="mdi mdi-key"></i></span>
+                    </div>
+                </div>
+
+                <div class="field mt-4">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            <span>Sign In</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <hr>
+
+            <!-- Demo Credentials Helper -->
+            <div class="content is-small has-text-grey">
+                <p class="has-text-weight-bold mb-2">Demo Credentials:</p>
+                <div class="buttons are-small">
+                    <button type="button" class="button is-light" onclick="setCreds('admin@acxiom.com', 'Password@123')">Admin</button>
+                    <button type="button" class="button is-light" onclick="setCreds('manager@acxiom.com', 'Password@123')">Manager</button>
+                    <button type="button" class="button is-light" onclick="setCreds('sales@acxiom.com', 'Password@123')">Sales</button>
+                </div>
+            </div>
+
+            <div class="has-text-centered is-size-7 mt-3">
+                <span>New here? <a th:href="@{/register}" class="has-text-link">Register an account</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setCreds(u, p) {
+        document.getElementById('username').value = u;
+        document.getElementById('password').value = p;
+    }
+</script>
+</body>
+</html>

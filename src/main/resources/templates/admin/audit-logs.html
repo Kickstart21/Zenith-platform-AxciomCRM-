@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#adminAuditContent}, title='Security Audit Trail')}">
+    <div id="adminAuditContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Admin</li>
+                            <li>Audit Trail</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <span class="tag is-dark is-medium">
+                            <span class="icon is-small"><i class="mdi mdi-shield-lock"></i></span>
+                            <span>Immutable Audit Ledger</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Security & Operational Logs</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <!-- Filter Toolbar -->
+            <div class="card mb-4">
+                <div class="card-content">
+                    <form th:action="@{/admin/audit-logs}" method="get">
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" name="userId" th:value="${userId}"
+                                               placeholder="Filter by user email...">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" name="entityName" th:value="${entityName}"
+                                               placeholder="Entity (Customer, Lead, User)...">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-cube-outline"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <div class="select">
+                                            <select name="action">
+                                                <option value="">All Actions</option>
+                                                <option value="LOGIN" th:selected="${action == 'LOGIN'}">LOGIN</option>
+                                                <option value="FAILED_LOGIN" th:selected="${action == 'FAILED_LOGIN'}">FAILED_LOGIN</option>
+                                                <option value="LOCKOUT" th:selected="${action == 'LOCKOUT'}">LOCKOUT</option>
+                                                <option value="CREATE" th:selected="${action == 'CREATE'}">CREATE</option>
+                                                <option value="UPDATE" th:selected="${action == 'UPDATE'}">UPDATE</option>
+                                                <option value="DELETE" th:selected="${action == 'DELETE'}">DELETE</option>
+                                                <option value="CONVERT" th:selected="${action == 'CONVERT'}">CONVERT</option>
+                                                <option value="ROLE_CHANGE" th:selected="${action == 'ROLE_CHANGE'}">ROLE_CHANGE</option>
+                                                <option value="SECURITY" th:selected="${action == 'SECURITY'}">SECURITY</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <button type="submit" class="button is-info">Filter</button>
+                                        <a th:href="@{/admin/audit-logs}" class="button is-light">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Audit Logs Table -->
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-shield-check"></i></span>
+                        Audit Entries (<span th:text="${totalElements}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" style="font-family: monospace; font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Actor User</th>
+                                        <th>Action</th>
+                                        <th>Entity</th>
+                                        <th>Record ID</th>
+                                        <th>Client IP</th>
+                                        <th>Event Snapshot</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${logs.empty}">
+                                        <td colspan="7" class="has-text-centered has-text-grey py-5">
+                                            <span class="icon is-large"><i class="mdi mdi-shield-search mdi-48px"></i></span>
+                                            <p>No audit log records found.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="l : ${logs}">
+                                        <td data-label="Timestamp" th:text="${#temporals.format(l.createdDate, 'dd-MMM-yyyy HH:mm:ss')}">Timestamp</td>
+                                        <td data-label="Actor" class="has-text-weight-bold" th:text="${l.userId}">admin@acxiom.com</td>
+                                        <td data-label="Action">
+                                            <span class="tag"
+                                                  th:classappend="${l.action == 'LOGIN' ? 'is-success' : (l.action == 'FAILED_LOGIN' ? 'is-warning' : (l.action == 'LOCKOUT' ? 'is-danger' : (l.action == 'CREATE' ? 'is-info' : (l.action == 'DELETE' ? 'is-dark' : 'is-light'))))}"
+                                                  th:text="${l.action}">ACTION</span>
+                                        </td>
+                                        <td data-label="Entity" th:text="${l.entityName}">Customer</td>
+                                        <td data-label="Record ID" th:text="${l.recordId != null ? l.recordId : '-'}">101</td>
+                                        <td data-label="IP" class="has-text-grey" th:text="${l.ipAddress}">127.0.0.1</td>
+                                        <td data-label="Snapshot">
+                                            <div th:if="${l.newValue != null}" style="max-width: 360px; word-break: break-all;"
+                                                 th:title="${l.newValue}" th:text="${l.newValue}">Details</div>
+                                            <div th:if="${l.oldValue != null}" class="has-text-grey is-size-7" style="max-width: 360px; word-break: break-all;"
+                                                 th:title="'Old Value: ' + ${l.oldValue}">
+                                                <span>Prev: </span><span th:text="${l.oldValue}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Notification -->
+                        <div th:if="${totalPages > 1}" class="notification">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="buttons has-addons">
+                                            <a th:if="${currentPage > 0}" th:href="@{/admin/audit-logs(page=${currentPage - 1}, userId=${userId}, entityName=${entityName}, action=${action})}"
+                                               class="button">&laquo;</a>
+                                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                               th:href="@{/admin/audit-logs(page=${i}, userId=${userId}, entityName=${entityName}, action=${action})}"
+                                               class="button" th:classappend="${i == currentPage ? 'is-active' : ''}"
+                                               th:text="${i + 1}">1</a>
+                                            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/admin/audit-logs(page=${currentPage + 1}, userId=${userId}, entityName=${entityName}, action=${action})}"
+                                               class="button">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <small>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span> (<span th:text="${totalElements}">0</span> total)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

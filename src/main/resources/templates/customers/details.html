@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#customerDetailsContent}, title='Customer Details')}">
+    <div id="customerDetailsContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/customers}">Customers</a></li>
+                            <li>Profile</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/customers/{id}/edit(id=${customer.customerId})}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                <span>Edit Profile</span>
+                            </a>
+                            <a th:href="@{/customers}" class="button is-light">
+                                <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                                <span>Back to List</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title" th:text="${customer.customerName}">Customer Name</h1>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <span class="tag is-medium" 
+                                  th:classappend="${customer.status == 'Active' ? 'is-success' : 'is-light'}"
+                                  th:text="${customer.status}">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Tiles -->
+        <section class="section is-main-section">
+            <div class="tile is-ancestor">
+                <div class="tile is-parent is-8">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-account-card-details"></i></span>
+                                Account Specifications
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Customer Code</p>
+                                    <p class="subtitle is-6">
+                                        <span class="tag is-info is-light" th:text="${customer.customerCode}">CUST-1001</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Parent Company</p>
+                                    <p class="subtitle is-6" th:text="${customer.companyName != null ? customer.companyName : 'N/A'}">Acxiom Corp</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Email Address</p>
+                                    <p class="subtitle is-6">
+                                        <a th:href="'mailto:' + ${customer.email}" th:text="${customer.email}">email@domain.com</a>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Phone</p>
+                                    <p class="subtitle is-6" th:text="${customer.phone}">+91 9876543210</p>
+                                </div>
+                                <div class="column is-12">
+                                    <p class="heading has-text-grey">Registered Address</p>
+                                    <p class="subtitle is-6" th:text="${customer.address != null ? customer.address : 'N/A'}">Address</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">City & State</p>
+                                    <p class="subtitle is-6">
+                                        <span th:text="${customer.city != null ? customer.city : 'N/A'}">City</span>,
+                                        <span th:text="${customer.state != null ? customer.state : 'N/A'}">State</span>
+                                    </p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Account Manager / Created By</p>
+                                    <p class="subtitle is-6" th:text="${customer.createdBy}">admin@acxiom.com</p>
+                                </div>
+                                <div class="column is-6">
+                                    <p class="heading has-text-grey">Created Date</p>
+                                    <p class="subtitle is-6" th:text="${#temporals.format(customer.createdDate, 'dd-MMM-yyyy HH:mm')}">Date</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tile is-parent is-4">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-lightning-bolt"></i></span>
+                                Quick Actions
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="buttons">
+                                <a th:href="@{/opportunities/create}" class="button is-fullwidth is-success is-outlined mb-3">
+                                    <span class="icon"><i class="mdi mdi-briefcase-plus"></i></span>
+                                    <span>Create Opportunity</span>
+                                </a>
+                                <a th:href="@{/followups/create(customerId=${customer.customerId})}" class="button is-fullwidth is-info is-outlined mb-3">
+                                    <span class="icon"><i class="mdi mdi-calendar-plus"></i></span>
+                                    <span>Schedule Follow-Up</span>
+                                </a>
+                                <a th:href="@{/activities/create(customerId=${customer.customerId})}" class="button is-fullwidth is-primary is-outlined mb-3">
+                                    <span class="icon"><i class="mdi mdi-clipboard-text-outline"></i></span>
+                                    <span>Log Activity</span>
+                                </a>
+                                <a th:href="@{/followups(customerId=${customer.customerId})}" class="button is-fullwidth is-light">
+                                    <span class="icon"><i class="mdi mdi-history"></i></span>
+                                    <span>Follow-Up History</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

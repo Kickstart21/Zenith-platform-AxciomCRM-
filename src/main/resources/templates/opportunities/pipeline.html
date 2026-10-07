@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#pipelineContent}, title='Sales Pipeline Board')}">
+    <div id="pipelineContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/opportunities}">Opportunities</a></li>
+                            <li>Kanban Pipeline</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/opportunities}" class="button is-light">
+                                <span class="icon"><i class="mdi mdi-table"></i></span>
+                                <span>Table View</span>
+                            </a>
+                            <a th:href="@{/opportunities/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>New Opportunity</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Visual Pipeline Board</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kanban Board Section -->
+        <section class="section is-main-section">
+            <div class="columns is-multiline">
+                <div class="column" style="min-width: 240px;" th:each="stg : ${stages}">
+                    <div class="card" style="background: #f7f9fa; height: 100%;">
+                        <header class="card-header" style="background: #ffffff;">
+                            <p class="card-header-title is-size-7 has-text-weight-bold" style="text-transform: uppercase;">
+                                <span th:text="${stg.label}">Stage</span>
+                            </p>
+                            <span class="card-header-icon">
+                                <span class="tag is-rounded is-info is-light"
+                                      th:text="${pipelineMap[stg] != null ? pipelineMap[stg].size() : 0}">0</span>
+                            </span>
+                        </header>
+                        <div class="card-content p-2" style="min-height: 400px; max-height: 700px; overflow-y: auto;">
+                            <div th:if="${pipelineMap[stg] == null or pipelineMap[stg].empty}"
+                                 class="has-text-centered has-text-grey is-size-7 py-5">
+                                No deals in this stage
+                            </div>
+
+                            <div th:each="opp : ${pipelineMap[stg]}" class="card mb-2" style="border: 1px solid #e1e8ed; box-shadow: none;">
+                                <div class="card-content p-3">
+                                    <p class="is-size-7 has-text-weight-bold mb-1">
+                                        <a th:href="@{/opportunities/{id}(id=${opp.opportunityId})}"
+                                           class="has-text-dark" th:text="${opp.opportunityName}">Deal Name</a>
+                                    </p>
+                                    <div class="level is-mobile mb-1">
+                                        <div class="level-left">
+                                            <span class="has-text-success has-text-weight-bold is-size-7">
+                                                ₹<span th:text="${#numbers.formatDecimal(opp.amount, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                            </span>
+                                        </div>
+                                        <div class="level-right">
+                                            <span class="tag is-small is-light" th:text="${opp.probability + '%'}">50%</span>
+                                        </div>
+                                    </div>
+                                    <div class="level is-mobile pt-2" style="border-top: 1px solid #f0f0f0;">
+                                        <div class="level-left">
+                                            <small class="has-text-grey" th:text="${#temporals.format(opp.expectedCloseDate, 'dd-MMM')}">15-Oct</small>
+                                        </div>
+                                        <div class="level-right">
+                                            <a th:href="@{/opportunities/{id}/edit(id=${opp.opportunityId})}" class="has-text-info">
+                                                <span class="icon is-small"><i class="mdi mdi-square-edit-outline"></i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

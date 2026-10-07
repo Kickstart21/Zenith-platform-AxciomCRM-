@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#oppListContent}, title='Opportunity Management')}">
+    <div id="oppListContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li>Opportunities</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/opportunities/pipeline}" class="button is-info is-outlined">
+                                <span class="icon"><i class="mdi mdi-view-column"></i></span>
+                                <span>Kanban Pipeline</span>
+                            </a>
+                            <a th:href="@{/opportunities/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>New Opportunity</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Sales Opportunities</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <!-- Filter Card -->
+            <div class="card mb-4">
+                <div class="card-content">
+                    <form th:action="@{/opportunities}" method="get">
+                        <div class="field is-horizontal">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" name="query" th:value="${query}"
+                                               placeholder="Search by opportunity name...">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-magnify"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <div class="select">
+                                            <select name="stage">
+                                                <option value="">All Stages</option>
+                                                <option th:each="stg : ${stages}" th:value="${stg}" th:text="${stg.label}"
+                                                        th:selected="${stg == selectedStage}">Qualification</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <button type="submit" class="button is-info">Filter</button>
+                                        <a th:href="@{/opportunities}" class="button is-light">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Opportunities Table Card -->
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-briefcase"></i></span>
+                        Active Deals (<span th:text="${totalElements}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Opportunity Deal</th>
+                                        <th>Deal Amount</th>
+                                        <th>Stage</th>
+                                        <th>Probability</th>
+                                        <th>Weighted Value</th>
+                                        <th>Close Date</th>
+                                        <th>Assigned To</th>
+                                        <th class="has-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${opportunities.empty}">
+                                        <td colspan="8" class="has-text-centered has-text-grey py-5">
+                                            <span class="icon is-large"><i class="mdi mdi-emoticon-sad mdi-48px"></i></span>
+                                            <p>No opportunities found matching your criteria.</p>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="o : ${opportunities}">
+                                        <td data-label="Deal">
+                                            <a th:href="@{/opportunities/{id}(id=${o.opportunityId})}" class="has-text-weight-bold"
+                                               th:text="${o.opportunityName}">Enterprise Deal</a>
+                                        </td>
+                                        <td data-label="Amount">
+                                            <strong>₹<span th:text="${#numbers.formatDecimal(o.amount, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                                        </td>
+                                        <td data-label="Stage">
+                                            <span class="tag"
+                                                  th:classappend="${o.stage.name() == 'WON' ? 'is-success' : (o.stage.name() == 'LOST' ? 'is-danger' : (o.stage.name() == 'NEGOTIATION' ? 'is-primary' : (o.stage.name() == 'PROPOSAL' ? 'is-info' : 'is-warning')))}"
+                                                  th:text="${o.stage.label}">Qualification</span>
+                                        </td>
+                                        <td data-label="Probability" class="is-progress-cell">
+                                            <progress max="100" class="progress is-small"
+                                                      th:classappend="${o.probability >= 70 ? 'is-success' : (o.probability >= 40 ? 'is-primary' : 'is-warning')}"
+                                                      th:value="${o.probability}" th:text="${o.probability} + '%'"></progress>
+                                        </td>
+                                        <td data-label="Weighted" class="has-text-weight-semibold has-text-success">
+                                            ₹<span th:text="${#numbers.formatDecimal(o.weightedValue, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                                        </td>
+                                        <td data-label="Close Date">
+                                            <small class="has-text-grey" th:text="${#temporals.format(o.expectedCloseDate, 'dd-MMM-yyyy')}">15-Oct-2026</small>
+                                        </td>
+                                        <td data-label="Assigned" th:text="${o.assignedTo}">sales@acxiom.com</td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <a th:href="@{/opportunities/{id}(id=${o.opportunityId})}" class="button is-small is-primary is-outlined" title="View Details">
+                                                    <span class="icon"><i class="mdi mdi-eye"></i></span>
+                                                </a>
+                                                <a th:href="@{/opportunities/{id}/edit(id=${o.opportunityId})}" class="button is-small is-info is-outlined" title="Edit">
+                                                    <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                                </a>
+                                                <form th:action="@{/opportunities/{id}/delete(id=${o.opportunityId})}" method="post" style="display:inline;"
+                                                      onsubmit="return confirm('Are you sure you want to delete this opportunity?');">
+                                                    <button type="submit" class="button is-small is-danger is-outlined" title="Delete">
+                                                        <span class="icon"><i class="mdi mdi-trash-can"></i></span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Notification -->
+                        <div th:if="${totalPages > 1}" class="notification">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="buttons has-addons">
+                                            <a th:if="${currentPage > 0}" th:href="@{/opportunities(page=${currentPage - 1}, query=${query}, stage=${selectedStage})}"
+                                               class="button">&laquo;</a>
+                                            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                               th:href="@{/opportunities(page=${i}, query=${query}, stage=${selectedStage})}"
+                                               class="button" th:classappend="${i == currentPage ? 'is-active' : ''}"
+                                               th:text="${i + 1}">1</a>
+                                            <a th:if="${currentPage + 1 < totalPages}" th:href="@{/opportunities(page=${currentPage + 1}, query=${query}, stage=${selectedStage})}"
+                                               class="button">&raquo;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <small>Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span> (<span th:text="${totalElements}">0</span> total)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>

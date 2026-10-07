@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" class="has-aside-left has-aside-mobile-transition has-navbar-fixed-top has-aside-expanded"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title != null ? title + ' — Zenith' : 'Zenith — Workspace'}">Zenith</title>
+
+    <!-- AdminOne / Bulma Theme -->
+    <link rel="stylesheet" th:href="@{/css/main.min.css}">
+
+    <!-- Fonts & Material Design Icons -->
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div id="app">
+    <!-- Navbar -->
+    <nav id="navbar-main" class="navbar is-fixed-top">
+        <div class="navbar-brand">
+            <a class="navbar-item is-hidden-desktop jb-aside-mobile-toggle">
+                <span class="icon"><i class="mdi mdi-forwardburger mdi-24px"></i></span>
+            </a>
+            <div class="navbar-item has-control">
+                <div class="control">
+                    <input placeholder="Search records everywhere..." class="input">
+                </div>
+            </div>
+        </div>
+        <div class="navbar-brand is-right">
+            <a class="navbar-item is-hidden-desktop jb-navbar-menu-toggle" data-target="navbar-menu">
+                <span class="icon"><i class="mdi mdi-dots-vertical"></i></span>
+            </a>
+        </div>
+        <div class="navbar-menu fadeIn animated faster" id="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item has-dropdown has-dropdown-with-icons has-divider has-user-avatar is-hoverable">
+                    <a class="navbar-link is-arrowless">
+                        <div class="is-user-avatar">
+                            <img src="https://avatars.dicebear.com/v2/initials/john-doe.svg" alt="User">
+                        </div>
+                        <div class="is-user-name">
+                            <span sec:authentication="name">User</span>
+                        </div>
+                        <span class="icon"><i class="mdi mdi-chevron-down"></i></span>
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a th:href="@{/dashboard}" class="navbar-item">
+                            <span class="icon"><i class="mdi mdi-view-dashboard"></i></span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a th:href="@{/customers}" class="navbar-item">
+                            <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+                            <span>Customers</span>
+                        </a>
+                        <hr class="navbar-divider">
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="navbar-item" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;padding:0.375rem 1rem;">
+                                <span class="icon"><i class="mdi mdi-logout"></i></span>
+                                <span>Log Out</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" title="Log out" class="navbar-item is-desktop-icon-only" style="background:none;border:none;cursor:pointer;height:100%;">
+                        <span class="icon"><i class="mdi mdi-logout"></i></span>
+                        <span>Log out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Left Aside Sidebar -->
+    <aside class="aside is-placed-left is-expanded">
+        <div class="aside-tools">
+            <div class="aside-tools-label">
+                <span><b>Zenith</b></span>
+            </div>
+        </div>
+        <div class="menu is-menu-main">
+            <p class="menu-label">General</p>
+            <ul class="menu-list">
+                <li>
+                    <a th:href="@{/dashboard}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+                        <span class="menu-item-label">Dashboard</span>
+                    </a>
+                </li>
+            </ul>
+
+            <p class="menu-label">Core Modules</p>
+            <ul class="menu-list">
+                <li>
+                    <a th:href="@{/customers}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+                        <span class="menu-item-label">Customers</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/leads}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-bullseye"></i></span>
+                        <span class="menu-item-label">Leads</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/opportunities}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-briefcase"></i></span>
+                        <span class="menu-item-label">Opportunities</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/opportunities/pipeline}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-view-column"></i></span>
+                        <span class="menu-item-label">Sales Pipeline</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/followups}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-calendar-clock"></i></span>
+                        <span class="menu-item-label">Follow-Ups</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/activities}" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-clipboard-text"></i></span>
+                        <span class="menu-item-label">Activities</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Manager & Admin Links -->
+            <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                <p class="menu-label">Analytics</p>
+                <ul class="menu-list">
+                    <li>
+                        <a th:href="@{/reports}" class="has-icon">
+                            <span class="icon"><i class="mdi mdi-file-chart"></i></span>
+                            <span class="menu-item-label">Reports & Export</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Admin Only Links -->
+            <div sec:authorize="hasRole('ADMIN')">
+                <p class="menu-label">Admin</p>
+                <ul class="menu-list">
+                    <li>
+                        <a th:href="@{/admin/users}" class="has-icon">
+                            <span class="icon"><i class="mdi mdi-shield-account"></i></span>
+                            <span class="menu-item-label">User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/admin/audit-logs}" class="has-icon">
+                            <span class="icon"><i class="mdi mdi-shield-check"></i></span>
+                            <span class="menu-item-label">Audit Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <p class="menu-label">Developer</p>
+            <ul class="menu-list">
+                <li>
+                    <a th:href="@{/swagger-ui.html}" target="_blank" class="has-icon">
+                        <span class="icon"><i class="mdi mdi-code-tags"></i></span>
+                        <span class="menu-item-label">Swagger REST API</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Notification Alerts -->
+    <div style="padding: 1rem 1.5rem 0 1.5rem;" th:if="${successMessage != null or errorMessage != null}">
+        <div th:if="${successMessage}" class="notification is-success" style="padding: 0.75rem 1.25rem;">
+            <button class="delete jb-notification-dismiss"></button>
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" class="notification is-danger" style="padding: 0.75rem 1.25rem;">
+            <button class="delete jb-notification-dismiss"></button>
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+    </div>
+
+    <!-- Page Injected Content -->
+    <div th:replace="${content}"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        © 2026 Zenith &bull; Enterprise Relationship Management Platform
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <small class="has-text-grey">Spring Boot 3 + H2 Engine</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Scripts -->
+<script type="text/javascript" th:src="@{/js/main.min.js}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</body>
+</html>

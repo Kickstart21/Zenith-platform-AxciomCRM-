@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#dashboardContent}, title='Dashboard')}">
+    <div id="dashboardContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Admin</li>
+                            <li>Dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/leads/create}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                                <span>Add Lead</span>
+                            </a>
+                            <a th:href="@{/opportunities/create}" class="button is-info">
+                                <span class="icon"><i class="mdi mdi-briefcase-plus"></i></span>
+                                <span>Add Opportunity</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">Dashboard</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section (AdminOne Exact Structure) -->
+        <section class="section is-main-section">
+            <!-- 3 Top Metric Tiles -->
+            <div class="tile is-ancestor">
+                <!-- Clients Tile -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child">
+                        <div class="card-content">
+                            <div class="level is-mobile">
+                                <div class="level-item">
+                                    <div class="is-widget-label">
+                                        <h3 class="subtitle is-spaced">Clients</h3>
+                                        <h1 class="title" th:text="${metrics.totalCustomers}">512</h1>
+                                    </div>
+                                </div>
+                                <div class="level-item has-widget-icon">
+                                    <div class="is-widget-icon">
+                                        <span class="icon has-text-primary is-large">
+                                            <i class="mdi mdi-account-multiple mdi-48px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Tile -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child">
+                        <div class="card-content">
+                            <div class="level is-mobile">
+                                <div class="level-item">
+                                    <div class="is-widget-label">
+                                        <h3 class="subtitle is-spaced">Pipeline Sales</h3>
+                                        <h1 class="title">₹<span th:text="${#numbers.formatDecimal(metrics.totalPipelineValue, 1, 'COMMA', 0, 'POINT')}">7,770</span></h1>
+                                    </div>
+                                </div>
+                                <div class="level-item has-widget-icon">
+                                    <div class="is-widget-icon">
+                                        <span class="icon has-text-info is-large">
+                                            <i class="mdi mdi-cart-outline mdi-48px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Tile -->
+                <div class="tile is-parent">
+                    <div class="card tile is-child">
+                        <div class="card-content">
+                            <div class="level is-mobile">
+                                <div class="level-item">
+                                    <div class="is-widget-label">
+                                        <h3 class="subtitle is-spaced">Performance</h3>
+                                        <h1 class="title"><span th:text="${metrics.openOpportunities}">0</span> / <span th:text="${metrics.totalOpportunities}">0</span> Deals</h1>
+                                    </div>
+                                </div>
+                                <div class="level-item has-widget-icon">
+                                    <div class="is-widget-icon">
+                                        <span class="icon has-text-success is-large">
+                                            <i class="mdi mdi-finance mdi-48px"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Chart Card -->
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-finance"></i></span>
+                        Performance
+                    </p>
+                    <a th:href="@{/dashboard}" class="card-header-icon" title="Reload Metrics">
+                        <span class="icon"><i class="mdi mdi-reload"></i></span>
+                    </a>
+                </header>
+                <div class="card-content">
+                    <div class="chart-area" style="position: relative; height: 350px;">
+                        <canvas id="big-line-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakdown Charts -->
+            <div class="tile is-ancestor">
+                <div class="tile is-parent is-6">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-chart-donut"></i></span>
+                                Lead Funnel Distribution
+                            </p>
+                        </header>
+                        <div class="card-content" style="position: relative; height: 260px;">
+                            <canvas id="leadStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tile is-parent is-6">
+                    <div class="card tile is-child">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <span class="icon"><i class="mdi mdi-chart-bar"></i></span>
+                                Pipeline Stage Overview
+                            </p>
+                        </header>
+                        <div class="card-content" style="position: relative; height: 260px;">
+                            <canvas id="opportunityStageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients Table Card (Matches AdminOne demo index.html) -->
+            <div class="card has-table has-mobile-sort-spaced">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-account-multiple"></i></span>
+                        Clients
+                    </p>
+                    <a th:href="@{/customers}" class="card-header-icon" title="View All Customers">
+                        <span class="icon"><i class="mdi mdi-arrow-right"></i></span>
+                    </a>
+                </header>
+                <div class="card-content">
+                    <div class="b-table has-pagination">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-sortable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Company</th>
+                                        <th>City</th>
+                                        <th>Progress</th>
+                                        <th>Created</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c : ${recentCustomers}">
+                                        <td class="is-image-cell">
+                                            <div class="image">
+                                                <img th:src="'https://api.dicebear.com/7.x/initials/svg?seed=' + ${#strings.replace(c.customerName, ' ', '+')}"
+                                                     class="is-rounded" style="width: 28px; height: 28px;" alt="Avatar">
+                                            </div>
+                                        </td>
+                                        <td data-label="Name">
+                                            <a th:href="@{/customers/{id}(id=${c.customerId})}" class="has-text-weight-bold" th:text="${c.customerName}">Rebecca Bauch</a>
+                                        </td>
+                                        <td data-label="Company" th:text="${c.companyName != null ? c.companyName : '-'}">Daugherty-Daniel</td>
+                                        <td data-label="City" th:text="${c.city != null ? c.city : 'N/A'}">South Cory</td>
+                                        <td data-label="Progress" class="is-progress-cell">
+                                            <progress max="100" class="progress is-small"
+                                                      th:classappend="${c.status == 'Active' ? 'is-primary' : 'is-warning'}"
+                                                      th:value="${c.status == 'Active' ? 85 : 30}">85</progress>
+                                        </td>
+                                        <td data-label="Created">
+                                            <small class="has-text-grey is-abbr-like" th:text="${#temporals.format(c.createdDate, 'dd-MMM-yyyy')}">Oct 25, 2026</small>
+                                        </td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <a th:href="@{/customers/{id}(id=${c.customerId})}" class="button is-small is-primary" type="button" title="View Profile">
+                                                    <span class="icon"><i class="mdi mdi-eye"></i></span>
+                                                </a>
+                                                <a th:href="@{/customers/{id}/edit(id=${c.customerId})}" class="button is-small is-info is-outlined" type="button" title="Edit">
+                                                    <span class="icon"><i class="mdi mdi-square-edit-outline"></i></span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart.js Setup matching AdminOne Chart styling -->
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function () {
+                /*<![CDATA[*/
+                const leadData = /*[[${metrics.leadStatusData}]]*/ {};
+                const stageData = /*[[${metrics.opportunityStageData}]]*/ {};
+                const salesLabels = /*[[${metrics.monthlySalesLabels}]]*/ [];
+                const salesValues = /*[[${metrics.monthlySalesValues}]]*/ [];
+                /*]]>*/
+
+                // 1. Big Line Chart (Monthly Sales)
+                const bigCtx = document.getElementById('big-line-chart');
+                if (bigCtx) {
+                    new Chart(bigCtx, {
+                        type: 'line',
+                        data: {
+                            labels: salesLabels,
+                            datasets: [{
+                                label: 'Monthly Closed Deal Value (₹)',
+                                data: salesValues,
+                                borderColor: '#00d1b2',
+                                backgroundColor: 'rgba(0, 209, 178, 0.12)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: true }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Lead Status Doughnut Chart
+                const leadCtx = document.getElementById('leadStatusChart');
+                if (leadCtx) {
+                    new Chart(leadCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(leadData),
+                            datasets: [{
+                                data: Object.values(leadData),
+                                backgroundColor: ['#3273dc', '#209cee', '#48c774', '#f14668', '#b86bff']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+
+                // 3. Stage Bar Chart
+                const stageCtx = document.getElementById('opportunityStageChart');
+                if (stageCtx) {
+                    new Chart(stageCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(stageData),
+                            datasets: [{
+                                label: 'Number of Deals',
+                                data: Object.values(stageData),
+                                backgroundColor: '#7957d5'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            });
+        </script>
+    </div>
+</div>
+
+</body>
+</html>

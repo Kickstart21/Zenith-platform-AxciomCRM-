@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#adminUsersContent}, title='User Administration')}">
+    <div id="adminUsersContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Admin</li>
+                            <li>Users</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons is-right">
+                            <a th:href="@{/register}" class="button is-primary">
+                                <span class="icon"><i class="mdi mdi-account-plus"></i></span>
+                                <span>Create User</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title">User & Role Management</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section -->
+        <section class="section is-main-section">
+            <div class="card has-table">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-shield-account"></i></span>
+                        System Users (<span th:text="${users.size()}">0</span>)
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="b-table">
+                        <div class="table-wrapper has-mobile-cards">
+                            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>User Account</th>
+                                        <th>Assigned Role</th>
+                                        <th>Account Status</th>
+                                        <th>Failed Logins</th>
+                                        <th>Lockout Status</th>
+                                        <th class="has-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="u : ${users}">
+                                        <td data-label="User">
+                                            <div class="has-text-weight-bold" th:text="${u.fullName}">User Name</div>
+                                            <small class="has-text-grey" th:text="${u.email}">user@acxiom.com</small>
+                                        </td>
+                                        <td data-label="Role">
+                                            <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" style="display:inline-flex; align-items:center; gap: 0.5rem;">
+                                                <div class="select is-small">
+                                                    <select name="role">
+                                                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r.displayName}"
+                                                                th:selected="${r == u.role}">Role</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="button is-small is-light" title="Save Role">
+                                                    <span class="icon is-small"><i class="mdi mdi-check"></i></span>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td data-label="Status">
+                                            <span class="tag" th:classappend="${u.active ? 'is-success' : 'is-danger'}"
+                                                  th:text="${u.active ? 'Active' : 'Disabled'}">Active</span>
+                                        </td>
+                                        <td data-label="Attempts">
+                                            <span class="tag" th:classappend="${u.failedLoginAttempts > 0 ? 'is-warning' : 'is-light'}"
+                                                  th:text="${u.failedLoginAttempts + ' / 5'}">0 / 5</span>
+                                        </td>
+                                        <td data-label="Lockout">
+                                            <span th:if="${u.isAccountLocked()}" class="tag is-danger">
+                                                <span class="icon is-small"><i class="mdi mdi-lock"></i></span>
+                                                <span>LOCKED</span>
+                                            </span>
+                                            <span th:unless="${u.isAccountLocked()}" class="tag is-success is-light">
+                                                <span class="icon is-small"><i class="mdi mdi-lock-open"></i></span>
+                                                <span>Normal</span>
+                                            </span>
+                                        </td>
+                                        <td class="is-actions-cell">
+                                            <div class="buttons is-right">
+                                                <!-- Unlock Button -->
+                                                <form th:if="${u.isAccountLocked()}" th:action="@{/admin/users/{id}/unlock(id=${u.id})}" method="post" style="display:inline;">
+                                                    <button type="submit" class="button is-small is-success" title="Unlock Account">
+                                                        <span class="icon"><i class="mdi mdi-key"></i></span>
+                                                        <span>Unlock</span>
+                                                    </button>
+                                                </form>
+
+                                                <!-- Toggle Active -->
+                                                <form th:action="@{/admin/users/{id}/toggle-active(id=${u.id})}" method="post" style="display:inline;">
+                                                    <button type="submit" class="button is-small is-outlined"
+                                                            th:classappend="${u.active ? 'is-danger' : 'is-success'}"
+                                                            th:title="${u.active ? 'Deactivate' : 'Activate'}">
+                                                        <span class="icon"><i class="mdi" th:classappend="${u.active ? 'mdi-account-off' : 'mdi-account-check'}"></i></span>
+                                                    </button>
+                                                </form>
+
+                                                <!-- Trigger Reset Password Modal -->
+                                                <button type="button" class="button is-small is-warning is-outlined"
+                                                        th:onclick="'openResetModal(' + ${u.id} + ')'" title="Reset Password">
+                                                    <span class="icon"><i class="mdi mdi-shield-lock-outline"></i></span>
+                                                </button>
+                                            </div>
+
+                                            <!-- Reset Password Bulma Modal -->
+                                            <div class="modal" th:id="'resetModal' + ${u.id}">
+                                                <div class="modal-background" th:onclick="'closeResetModal(' + ${u.id} + ')'"></div>
+                                                <div class="modal-card">
+                                                    <header class="modal-card-head">
+                                                        <p class="modal-card-title">Reset Password: <span th:text="${u.email}"></span></p>
+                                                        <button class="delete" aria-label="close" type="button" th:onclick="'closeResetModal(' + ${u.id} + ')'"></button>
+                                                    </header>
+                                                    <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post">
+                                                        <section class="modal-card-body has-text-left">
+                                                            <div class="field">
+                                                                <label class="label">New Compliant Password</label>
+                                                                <div class="control has-icons-left">
+                                                                    <input type="password" name="newPassword" class="input"
+                                                                           placeholder="Min 8 chars: Upper, Lower, Digit, Special" required>
+                                                                    <span class="icon is-small is-left"><i class="mdi mdi-lock"></i></span>
+                                                                </div>
+                                                                <p class="help">Must contain uppercase, lowercase, digit, and special symbol (@$!%*?&#).</p>
+                                                            </div>
+                                                        </section>
+                                                        <footer class="modal-card-foot">
+                                                            <button type="submit" class="button is-primary">Confirm Reset</button>
+                                                            <button type="button" class="button" th:onclick="'closeResetModal(' + ${u.id} + ')'">Cancel</button>
+                                                        </footer>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            function openResetModal(id) {
+                const el = document.getElementById('resetModal' + id);
+                if (el) el.classList.add('is-active');
+            }
+            function closeResetModal(id) {
+                const el = document.getElementById('resetModal' + id);
+                if (el) el.classList.remove('is-active');
+            }
+        </script>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<div th:replace="~{layout/main :: html (content=~{::div#leadFormContent}, title=(${leadDto.leadId != null ? 'Edit Lead' : 'New Lead'}))}">
+    <div id="leadFormContent">
+        <!-- Title Bar -->
+        <section class="section is-title-bar">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <ul>
+                            <li>Zenith</li>
+                            <li><a th:href="@{/leads}">Leads</a></li>
+                            <li th:text="${leadDto.leadId != null ? 'Edit' : 'Create'}">Create</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a th:href="@{/leads}" class="button is-light">
+                            <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+                            <span>Back to List</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Bar -->
+        <section class="hero is-hero-bar">
+            <div class="hero-body">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 class="title" th:text="${leadDto.leadId != null ? 'Edit Lead: ' + leadDto.leadCode : 'Register New Lead'}">Lead Form</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Section (AdminOne Form Pattern) -->
+        <section class="section is-main-section">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="mdi mdi-ballot"></i></span>
+                        Lead Prospect Information
+                    </p>
+                </header>
+                <div class="card-content">
+                    <form th:action="${leadDto.leadId != null} ? @{/leads/{id}/edit(id=${leadDto.leadId})} : @{/leads/create}"
+                          th:object="${leadDto}" method="post">
+
+                        <!-- Lead Name -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Prospect Name *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{leadName}"
+                                               th:classappend="${#fields.hasErrors('leadName')} ? 'is-danger' : ''"
+                                               placeholder="Prospect or Project Name" required maxlength="120">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('leadName')}" th:errors="*{leadName}">Prospect Name is required.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email & Phone -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Contact Info *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="email" th:field="*{email}"
+                                               th:classappend="${#fields.hasErrors('email')} ? 'is-danger' : ''"
+                                               placeholder="Email address" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-email"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Valid Email is required.</p>
+                                </div>
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="tel" th:field="*{phone}"
+                                               th:classappend="${#fields.hasErrors('phone')} ? 'is-danger' : ''"
+                                               placeholder="10-digit Phone (starts 6-9)" required
+                                               pattern="^(?:\+91|0)?[6-9]\d{9}$">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-phone"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">10-digit Indian phone is required.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company & Source -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Company & Source</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{companyName}"
+                                               placeholder="Company / Organization" maxlength="150">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-domain"></i></span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{source}">
+                                                <option value="Website">Website Inbound</option>
+                                                <option value="LinkedIn">LinkedIn Campaign</option>
+                                                <option value="Referral">Client Referral</option>
+                                                <option value="Cold Call">Cold Outreach</option>
+                                                <option value="Expo">Conference / Expo</option>
+                                                <option value="Partner">Business Partner</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Expected Value & Status -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Value & Status *</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="number" step="0.01" min="0" th:field="*{expectedValue}"
+                                               th:classappend="${#fields.hasErrors('expectedValue')} ? 'is-danger' : ''"
+                                               placeholder="Expected Value (INR)" required>
+                                        <span class="icon is-small is-left"><i class="mdi mdi-currency-inr"></i></span>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('expectedValue')}" th:errors="*{expectedValue}">Expected value must be positive.</p>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select th:field="*{status}">
+                                                <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.label}">Status</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Assigned Executive</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" th:field="*{assignedTo}"
+                                               placeholder="e.g. sales@acxiom.com (leave blank for self)">
+                                        <span class="icon is-small is-left"><i class="mdi mdi-account-tie"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Action Buttons -->
+                        <div class="field is-horizontal">
+                            <div class="field-label"></div>
+                            <div class="field-body">
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary">
+                                            <span class="icon"><i class="mdi mdi-check"></i></span>
+                                            <span>Save Lead</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <a th:href="@{/leads}" class="button is-light">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+</html>
